@@ -222,11 +222,11 @@ func GetTransaction(hTdb C.THANDLE, szCode string, szMarketKey string, nDate int
 	sizeOf := unsafe.Sizeof(*pTransaction)
 	for i:=0; i<int(pCount); {
 		pT := (*C.TDBDefine_Transaction)(unsafe.Pointer(tmpPtr))
-		fmt.Printf("成交时间(Date): %d \n", pT.nDate)
-		fmt.Printf("成交时间: %d \n", pT.nTime)
-		fmt.Printf("成交代码: %c \n", byte(pT.chFunctionCode))
-		fmt.Printf("委托类别: %c \n", byte(pT.chOrderKind))
-		fmt.Printf("BS标志: %c \n", byte(pT.chBSFlag))
+		fmt.Printf("成交时间(Date): %d \n", int(pT.nDate))
+		fmt.Printf("成交时间: %d \n", int(pT.nTime))
+		fmt.Printf("成交代码: %c \n", pT.chFunctionCode)
+		fmt.Printf("委托类别: %c \n", pT.chOrderKind)
+		fmt.Printf("BS标志: %c \n", pT.chBSFlag)
 		fmt.Printf("成交价格: %d \n", pT.nTradePrice)
 		fmt.Printf("成交数量: %d \n", pT.nTradeVolume)
 		fmt.Printf("叫卖序号: %d \n", pT.nAskOrder)
@@ -251,14 +251,14 @@ func GetOrder(hTdb C.THANDLE, szCode string, szMarketKey string, nDate int)  {
 	var pCount C.int
 	C.TDB_GetOrder(hTdb,&req, &pOrder, &pCount)
 
-	fmt.Println("-------------------------Transaction Data--------------------------")
+	fmt.Println("-------------------------Order Data--------------------------")
 	fmt.Printf("收到 %d 条逐笔委托消息，打印 1/10000 条\n", pCount)
 	tmpPtr := uintptr(unsafe.Pointer(pOrder))
 	sizeOf := unsafe.Sizeof(*pOrder)
 	for i:=0; i<int(pCount); {
 		pO := (*C.TDBDefine_Order)(unsafe.Pointer(tmpPtr))
 		fmt.Printf("订单时间(Date): %d \n", pO.nDate)
-		fmt.Printf("委托时间(HHMMSSmmm): %d \n", (*C.int)(unsafe.Pointer(uintptr(unsafe.Pointer(pOrder)) + unsafe.Offsetof(pOrder.nTime))))
+		fmt.Printf("委托时间(HHMMSSmmm): %d \n", pO.nTime)
 		fmt.Printf("委托编号: %d \n", pO.nOrder)
 		fmt.Printf("委托类别: %c \n", pO.chOrderKind)
 		fmt.Printf("委托代码: %c \n", pO.chFunctionCode)
@@ -305,6 +305,8 @@ func GetOrderQueue(hTdb C.THANDLE, szCode string, szMarketKey string, nDate int)
 
 //指标公式
 func UseEZFFormula(hTdb C.THANDLE) {
+
+	fmt.Println("-----------------------UseEZFFormula----------------------------")
 	//公式的编写，请参考<<TRANSEND-TS-M0001 易编公式函数表V1(2).0-20110822.pdf>>
 	strName := "KDJ"
 	strContent := "INPUT:N(9), M1(3,1,100,2), M2(3);RSV:=(CLOSE-LLV(LOW,N))/(HHV(HIGH,N)-LLV(LOW,N))*100;K:SMA(RSV,M1,1);D:SMA(K,M2,1);J:3*K-2*D;"
